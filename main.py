@@ -1,21 +1,22 @@
 from fastapi import FastAPI
-from routers import productos, categorias
-
-app = FastAPI(title="API de la Tienda")
-
-# Conectamos los routers de cada recurso
-app.include_router(productos.router)
-app.include_router(categorias.router)
-
-@app.get("/", tags=["Inicio"])
-def inicio():
-    return {"mensaje": "API de la Tienda funcionando. Visita /docs"}
-
-from fastapi import FastAPI
 from routers import auth, productos, categorias
 
-app = FastAPI(title="API E-Commerce Segura")
+# Inicialización de la aplicación FastAPI con metadatos para Swagger
+app = FastAPI(
+    title="API E-Commerce Segura",
+    description="API REST modularizada con autenticación OAuth2 / JWT y control de acceso por roles (RBAC).",
+    version="1.0.0"
+)
 
+# Registro de routers para los módulos del sistema
 app.include_router(auth.router)
 app.include_router(productos.router)
 app.include_router(categorias.router)
+
+# Endpoint raíz de bienvenida
+@app.get("/", tags=["Inicio"])
+def inicio():
+    return {
+        "mensaje": "API E-Commerce Segura funcionando correctamente.",
+        "documentacion": "Visita /docs para probar los endpoints interactivos con Swagger UI."
+    }

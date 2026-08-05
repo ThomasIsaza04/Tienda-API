@@ -7,10 +7,27 @@ class CategoriaEntrada(BaseModel):
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
-# GET público
+# Lista de prueba en memoria
+categorias_db = [
+    {"id": 1, "nombre": "Electrónica"}
+]
+
+# --- ENDPOINTS PÚBLICOS ---
+
+# Listar todas las categorías
 @router.get("")
 def listar_categorias():
-    return [{"id": 1, "nombre": "Electrónica"}]
+    return categorias_db
+
+# Obtener categoría por ID
+@router.get("/{categoria_id}")
+def obtener_categoria(categoria_id: int):
+    for cat in categorias_db:
+        if cat["id"] == categoria_id:
+            return cat
+    raise HTTPException(status_code=404, detail="Categoría no encontrada")
+
+# --- ENDPOINTS PROTEGIDOS ---
 
 # POST protegido (requiere autenticación)
 @router.post("", status_code=201)
@@ -18,9 +35,11 @@ def crear_categoria(
     datos: CategoriaEntrada,
     usuario: dict = Depends(seguridad.obtener_usuario_actual)
 ):
+    nueva = {"id": len(categorias_db) + 1, "nombre": datos.nombre}
+    categorias_db.append(nueva)
     return {
         "mensaje": "Categoría creada",
-        "categoria": {"id": 2, "nombre": datos.nombre},
+        "categoria": nueva,
         "creada_por": usuario["username"]
     }
 
@@ -31,10 +50,14 @@ def actualizar_categoria(
     datos: CategoriaEntrada,
     usuario: dict = Depends(seguridad.obtener_usuario_actual)
 ):
-    return {
-        "mensaje": f"Categoría {categoria_id} actualizada",
-        "actualizada_por": usuario["username"]
-    }
+    for cat in categorias_db:
+        if cat["id"] == categoria_id:
+            cat["nombre"] = datos.nombre
+            return {
+                "mensaje": f"Categoría {categoria_id} actualizada",
+                "actualizada_por": usuario["username"]
+            }
+    raise HTTPException(status_code=404, detail="Categoría no encontrada")
 
 # DELETE protegido (requiere rol admin)
 @router.delete("/{categoria_id}")
@@ -42,7 +65,11 @@ def eliminar_categoria(
     categoria_id: int,
     admin: dict = Depends(seguridad.requerir_admin)
 ):
-    return {
-        "mensaje": f"Categoría {categoria_id} eliminada",
-        "eliminada_por": admin["username"]
-    }
+    for i, cat in enumerate(categorias_db):
+        if cat["id"] == categoria_id:
+            categorias_db.pop(i)
+            return {
+                "mensaje": f"Categoría {categoria_id} eliminada",
+                "eliminada_por": admin["username"]
+            }
+    raise HTTPException(status_code=404, detail="Categoría no encontrada")
