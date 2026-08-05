@@ -29,8 +29,7 @@ tienda-api/
 │   ├── productos.py     # CRUD del módulo de Productos
 │   └── usuarios.py      # Administración de Usuarios y perfil
 ├── main.py              # Punto de entrada y orquestador de routers
-├── seguridad.py         # Lógica JWT, bcrypt y dependencias RBAC
-├── requirements.txt     # Dependencias del proyecto
+├── seguridad.py         # Lógica JWT, bcrypt y dependencias
 └── README.md            # Documentación general
 
 ```
