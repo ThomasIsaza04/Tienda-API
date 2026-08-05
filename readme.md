@@ -1,181 +1,141 @@
-# Tienda API — Sistema de Gestión y Seguridad con FastAPI
+#  API E-Commerce Segura (FastAPI + JWT + RBAC)
 
-> **API RESTful profesional y modular construida con FastAPI, Python y Pydantic.**  
-> Diseñada bajo principios de arquitectura limpia, validación de datos estricta y control de acceso basado en roles (RBAC) mediante JWT.
-
----
-
-## Descripción General
-
-**Tienda API** es una solución backend diseñada para gestionar el catálogo completo de un sistema de comercio electrónico (categorías, productos) e incorporar mecanismos de autenticación y autorización segura. 
-
-Este proyecto implementa las mejores prácticas de desarrollo en Python:
-* **Inyección de dependencias** nativa de FastAPI.
-* **Mapeo y validación de esquemas** con Pydantic v2.
-* **Seguridad y JWT** para protección de rutas críticas.
-* **Estructura modular reutilizable** y escalable.
+API RESTful modularizada construida con **FastAPI**, implementando autenticación mediante **JSON Web Tokens (JWT)**, hashing seguro de contraseñas con **bcrypt** y **Control de Acceso Basado en Roles (RBAC)**.
 
 ---
 
 ## Características Principales
 
-- **Autenticación & Seguridad:**
-  - Encriptación de contraseñas.
-  - Generación y validación de tokens Bearer JWT (`OAuth2PasswordBearer`).
-  - Control de acceso por roles (p. ej., restricción de rutas exclusivas para administradores).
-
-- **Módulo de Productos & Categorías:**
-  - Operaciones **CRUD complejas** (Create, Read, Update, Delete).
-  - Paginación y filtrado de catálogo.
-  - Validación de tipos de datos e integridad referencial lógica.
-
-- **Arquitectura & Calidad:**
-  - Separación de responsabilidades mediante `APIRouter`.
-  - Tratamiento centralizado de excepciones HTTP (`401 Unauthorized`, `403 Forbidden`, `404 Not Found`).
-  - Generación de esquemas Open-API 3.0 en tiempo de ejecución.
+* **Seguridad & Autenticación:** 
+  * Generación y validación de tokens Bearer JWT (`PyJWT`).
+  * Encriptación de contraseñas mediante `bcrypt`.
+* **Control de Acceso por Roles (RBAC):**
+  * **Público:** Acceso libre a lecturas generales e individuales (`GET`).
+  * **Cliente / Autenticado:** Creación, modificación de perfil y gestión de pedidos propios (`POST`, `PUT`).
+  * **Administrador:** Control total sobre gestión de usuarios, eliminación de recursos y visualización global de pedidos (`DELETE`, `GET`).
+* **Documentación Interactiva:** Integración automática con OpenAPI y Swagger UI en `/docs`.
 
 ---
 
 ## Estructura del Proyecto
 
 ```text
-Tienda-Api/
-│
+tienda-api/
 ├── routers/
 │   ├── __init__.py
-│   ├── auth.py          # Autenticación, inicio de sesión y emisión de tokens
-│   ├── categorias.py    # Endpoints para el recurso Categorías
-│   ├── productos.py     # Endpoints para el recurso Productos
-│   └── seguridad.py     # Funciones de utilería JWT, hashing y dependencias
-│
-├── .gitignore           # Exclusión de venv, variables de entorno y temporales
-├── main.py              # Punto de entrada y configuración global del servidor
-└── README.md            # Documentación del proyecto
+│   ├── auth.py          # Endpoints de login, registro y perfil
+│   ├── categorias.py    # CRUD del módulo de Categorías
+│   ├── pedidos.py       # CRUD del módulo de Pedidos
+│   ├── productos.py     # CRUD del módulo de Productos
+│   └── usuarios.py      # Administración de Usuarios y perfil
+├── main.py              # Punto de entrada y orquestador de routers
+├── seguridad.py         # Lógica JWT, bcrypt y dependencias RBAC
+├── requirements.txt     # Dependencias del proyecto
+└── README.md            # Documentación general
 
 ```
 
+
+## 📌 Matriz de Endpoints y Permisos
+
+### 🔑 Autenticación (`/auth`)
+
+| Método | Endpoint | Descripción | Nivel de Acceso |
+| --- | --- | --- | --- |
+| `POST` | `/auth/login` | Inicia sesión y retorna Token JWT Bearer | Público |
+| `POST` | `/auth/registro` | Registra un nuevo usuario con rol `cliente` | Público |
+| `GET` | `/auth/yo` | Retorna la información del usuario autenticado | Autenticado |
+
+### 📦 Productos (`/productos`)
+
+| Método | Endpoint | Descripción | Nivel de Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/productos` | Listar todos los productos | Público |
+| `GET` | `/productos/{id}` | Consultar producto por ID | Público |
+| `POST` | `/productos` | Crear un producto | Autenticado |
+| `PUT` | `/productos/{id}` | Actualizar un producto existente | Autenticado |
+| `DELETE` | `/productos/{id}` | Eliminar producto | **Admin** |
+
+### 🏷️ Categorías (`/categorias`)
+
+| Método | Endpoint | Descripción | Nivel de Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/categorias` | Listar todas las categorías | Público |
+| `GET` | `/categorias/{id}` | Consultar categoría por ID | Público |
+| `POST` | `/categorias` | Crear una categoría | Autenticado |
+| `PUT` | `/categorias/{id}` | Actualizar una categoría existente | Autenticado |
+| `DELETE` | `/categorias/{id}` | Eliminar categoría | **Admin** |
+
+### 👥 Usuarios (`/usuarios`)
+
+| Método | Endpoint | Descripción | Nivel de Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/usuarios` | Listar todos los usuarios | **Admin** |
+| `GET` | `/usuarios/{username}` | Consultar usuario por username | **Admin** |
+| `PUT` | `/usuarios/perfil` | Actualizar nombre del perfil actual | Autenticado |
+| `DELETE` | `/usuarios/{username}` | Eliminar un usuario por username | **Admin** |
+
+### 🛍️ Pedidos (`/pedidos`)
+
+| Método | Endpoint | Descripción | Nivel de Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/pedidos` | Listar pedidos (Cliente ve los suyos, Admin ve todos) | Autenticado |
+| `GET` | `/pedidos/{id}` | Consultar pedido por ID (Dueño o Admin) | Autenticado |
+| `POST` | `/pedidos` | Realizar un nuevo pedido | Autenticado |
+| `DELETE` | `/pedidos/{id}` | Eliminar/Cancelar un pedido | **Admin** |
+
 ---
 
-## Tecnologías Utilizadas
-
-* **Lenguaje:** Python 3.10+
-* **Framework Web:** [FastAPI](https://fastapi.tiangolo.com/)
-* **Servidor ASGI:** [Uvicorn](https://www.google.com/search?q=https://www.uvicorn.org/)
-* **Validación de Datos:** [Pydantic v2](https://www.google.com/search?q=https://docs.pydantic.dev/)
-* **Seguridad:** PyJWT / Passlib / OAuth2
-
----
-
-## Requisitos Previos
-
-Antes de comenzar, asegúrate de contar con lo siguiente instalado en tu equipo:
-
-* **Python 3.10** o superior.
-* **Git** para el control de versiones.
-* Un gestor de paquetes (`pip`).
-
----
-
-## Instalación y Configuración
+## 🛠️ Instalación y Ejecución
 
 1. **Clonar el repositorio:**
 ```bash
-git clone [https://github.com/ThomasIsaza04/Tienda-API.git](https://github.com/ThomasIsaza04/Tienda-API.git)
-cd Tienda-Api
+git clone <URL_DE_TU_REPOSITO>
+cd tienda-api
 
 ```
 
 
-2. **Crear y activar un entorno virtual:**
-* En **Windows (PowerShell / CMD):**
-```powershell
-python -m venv venv
+2. **Activar el entorno virtual:**
+```bash
+# Windows (PowerShell / CMD)
 .\venv\Scripts\activate
 
-```
-
-
-* En **Linux / macOS:**
-```bash
-python3 -m venv venv
+# Linux / macOS
 source venv/bin/activate
 
 ```
 
 
-
-
-3. **Instalar las dependencias del proyecto:**
+3. **Instalar dependencias:**
 ```bash
-pip install fastapi uvicorn pydantic pyjwt "passlib[bcrypt]"
+pip install fastapi uvicorn pyjwt bcrypt pydantic
 
 ```
 
 
-
----
-
-## Ejecución del Servidor
-
-Para iniciar el servidor en modo de desarrollo con recarga automática (*hot-reload*):
-
+4. **Iniciar el servidor de desarrollo:**
 ```bash
 uvicorn main:app --reload
 
 ```
 
-El servicio estará disponible de manera predeterminada en:
-**`http://127.0.0.1:8000`**
 
----
+5. **Acceder a la documentación interactiva:**
+* **Swagger UI:** [http://127.0.0.1:8000/docs](https://www.google.com/search?q=http://127.0.0.1:8000/docs)
 
-## Endpoints Principales
 
-### Autenticación & Seguridad
-
-| Método | Endpoint | Descripción | Requiere Auth |
-| --- | --- | --- | --- |
-| `POST` | `/auth/login` | Autentica un usuario y devuelve un token JWT | ❌ |
-| `GET` | `/auth/me` | Obtiene el perfil del usuario autenticado | Bearer |
-
-### Categorías
-
-| Método | Endpoint | Descripción | Requiere Auth |
-| --- | --- | --- | --- |
-| `GET` | `/categorias/` | Lista todas las categorías | ❌ |
-| `POST` | `/categorias/` | Crea una nueva categoría | 🔒 Admin |
-| `PUT` | `/categorias/{id}` | Actualiza una categoría existente | 🔒 Admin |
-| `DELETE` | `/categorias/{id}` | Elimina una categoría | 🔒 Admin |
-
-### Productos
-
-| Método | Endpoint | Descripción | Requiere Auth |
-| --- | --- | --- | --- |
-| `GET` | `/productos/` | Lista los productos en catálogo | ❌ |
-| `GET` | `/productos/{id}` | Obtiene el detalle de un producto específico | ❌ |
-| `POST` | `/productos/` | Agrega un nuevo producto al inventario | 🔒 Admin |
-| `PUT` | `/productos/{id}` | Modifica la información de un producto | 🔒 Admin |
-| `DELETE` | `/productos/{id}` | Remueve un producto | 🔒 Admin |
-
----
-
-## Documentación Interactiva
-
-FastAPI genera documentación interactiva en vivo sin necesidad de herramientas externas:
-
-* **Swagger UI (Pruebas interactivas):** [http://127.0.0.1:8000/docs](https://www.google.com/search?q=http://127.0.0.1:8000/docs)
-* **ReDoc (Especificación limpia):** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-
-> **Tip:** Desde **Swagger UI** puedes usar el botón **"Authorize"** e ingresar tu token JWT (`Bearer <tu_token>`) para probar los endpoints protegidos.
-
----
-
-## Autor
-
-Desarrollado por **Thomas Isaza Chalarca** — [ThomasIsaza04](https://www.google.com/search?q=https://github.com/ThomasIsaza04)
 
 ```
 
-<FollowUp label="¿Quieres que le agregue algún módulo específico o guía de testing?" query="¿Puedes actualizar el README para agregar una sección de pruebas unitarias con Pytest?"/>
+---
+
+### Pasos para guardar el README actualizado en GitHub:
+
+Ejecuta estos 3 comandos desde la terminal de VS Code:
+
+1. `git add README.md`
+2. `git commit -m "Docs: Reorganizacion completa del README con modulos de Pedidos y Usuarios"`
+3. `git push origin main` *(o `master` según el nombre de tu rama)*
 
 ```
