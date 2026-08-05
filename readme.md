@@ -35,9 +35,9 @@ tienda-api/
 ```
 
 
-## 📌 Matriz de Endpoints y Permisos
+## Matriz de Endpoints y Permisos
 
-### 🔑 Autenticación (`/auth`)
+### Autenticación (`/auth`)
 
 | Método | Endpoint | Descripción | Nivel de Acceso |
 | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ tienda-api/
 | `POST` | `/auth/registro` | Registra un nuevo usuario con rol `cliente` | Público |
 | `GET` | `/auth/yo` | Retorna la información del usuario autenticado | Autenticado |
 
-### 📦 Productos (`/productos`)
+### Productos (`/productos`)
 
 | Método | Endpoint | Descripción | Nivel de Acceso |
 | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ tienda-api/
 | `PUT` | `/productos/{id}` | Actualizar un producto existente | Autenticado |
 | `DELETE` | `/productos/{id}` | Eliminar producto | **Admin** |
 
-### 🏷️ Categorías (`/categorias`)
+### Categorías (`/categorias`)
 
 | Método | Endpoint | Descripción | Nivel de Acceso |
 | --- | --- | --- | --- |
@@ -65,7 +65,7 @@ tienda-api/
 | `PUT` | `/categorias/{id}` | Actualizar una categoría existente | Autenticado |
 | `DELETE` | `/categorias/{id}` | Eliminar categoría | **Admin** |
 
-### 👥 Usuarios (`/usuarios`)
+### Usuarios (`/usuarios`)
 
 | Método | Endpoint | Descripción | Nivel de Acceso |
 | --- | --- | --- | --- |
@@ -74,7 +74,7 @@ tienda-api/
 | `PUT` | `/usuarios/perfil` | Actualizar nombre del perfil actual | Autenticado |
 | `DELETE` | `/usuarios/{username}` | Eliminar un usuario por username | **Admin** |
 
-### 🛍️ Pedidos (`/pedidos`)
+### Pedidos (`/pedidos`)
 
 | Método | Endpoint | Descripción | Nivel de Acceso |
 | --- | --- | --- | --- |
@@ -85,7 +85,7 @@ tienda-api/
 
 ---
 
-## 🛠️ Instalación y Ejecución
+## Instalación y Ejecución
 
 1. **Clonar el repositorio:**
 ```bash
